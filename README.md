@@ -1,8 +1,8 @@
 # AQI Predictor
 
 ``` bash
-git clone project
-cd project
+git clone https://github.com/MiteshChopda/AQI
+cd AQI
 ```
 ### Run application using `uv` :
 
