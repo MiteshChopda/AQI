@@ -1,9 +1,9 @@
 import pickle as pk
 
 
-linearRegressionModel = pk.load(open("./model/LinearRegression.model","rb"))
-DecisionTreeRegressorModel = pk.load(open("./model/DecisionTreeRegressor.model","rb"))
-RandomForestRegressorModel = pk.load(open("RandomForestRegressor.model","rb"))
+linearRegressionModel = pk.load(open("./models/LinearRegression.model","rb"))
+DecisionTreeRegressorModel = pk.load(open("./models/DecisionTreeRegressor.model","rb"))
+RandomForestRegressorModel = pk.load(open("./models/RandomForestRegressor.model","rb"))
 
 pollutants_mean = {
     "Noi":37.389323,

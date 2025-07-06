@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQI Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        input[type="number"]:hover, select:hover {
+            border-color: #667eea;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            padding: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .error {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            input[type="number"], button {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌬️ AQI Predictor</h1>
+        
+        <form id="aqiForm">
+            <div class="input-grid">
+                <div class="form-group">
+                    <label for="so2">SO2 (μg/m³)</label>
+                    <input type="number" id="so2" name="SO2i" placeholder="Do not know" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="no2">NO2 (μg/m³)</label>
+                    <input type="number" id="no2" name="Noi" placeholder="Do not know" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="rspm">RSPM (μg/m³)</label>
+                    <input type="number" id="rspm" name="RSPMi" placeholder="Do not know" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="spm">SPM (μg/m³)</label>
+                    <input type="number" id="spm" name="SPMi" placeholder="Do not know" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pm25">PM2.5 (μg/m³)</label>
+                    <input type="number" id="pm25" name="PM2_5i" placeholder="Do not know" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="model">Model Selection</label>
+                    <select id="model" name="model">
+                        <option value="linearRegressionModel" selected>Linear Regression Model</option>
+                        <option value="DecisionTreeRegressorModel">Decision Tree Regressor Model</option>
+                        <option value="RandomForestRegressorModel">Random Forest Regressor Model</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" id="predictBtn">
+                Predict AQI
+            </button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('aqiForm');
+        const resultDiv = document.getElementById('result');
+        const predictBtn = document.getElementById('predictBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading state
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = '<span class="loading"></span>Predicting...';
+            resultDiv.classList.remove('show');
+            
+            // Collect form data
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key === 'model') {
+                    data[key] = value;
+                } else {
+                    data[key] = value === '' ? null : parseFloat(value);
+                }
+            }
+            
+            try {
+                console.log(data);
+                
+                const response = await fetch('http://localhost:8000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Display success result
+                resultDiv.className = 'result show';
+                resultDiv.innerHTML = `
+                    <h3>🎯 Prediction Results</h3>
+                    <div style="margin: 15px 0;">
+                        <strong>AQI Value:</strong> ${result.AQI}
+                    </div>
+                    <div>
+                        <strong>AQI Range:</strong> ${result.AQI_range}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Display error result
+                resultDiv.className = 'result show error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Error</h3>
+                    <div>
+                        Failed to get prediction. Please check if the FastAPI server is running on localhost:8000.
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                        Error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                // Reset button state
+                predictBtn.disabled = false;
+                predictBtn.innerHTML = 'Predict AQI';
+            }
+        });
+
+        // Add some visual feedback for form inputs
+        const inputs = document.querySelectorAll('input[type="number"]');
+        const selects = document.querySelectorAll('select');
+        
+        inputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value !== '') {
+                    e.target.style.borderColor = '#4CAF50';
+                } else {
+                    e.target.style.borderColor = '#e0e0e0';
+                }
+            });
+        });
+        
+        selects.forEach(select => {
+            select.addEventListener('change', (e) => {
+                e.target.style.borderColor = '#4CAF50';
+            });
+        });
+    </script>
+</body>
+</html>
