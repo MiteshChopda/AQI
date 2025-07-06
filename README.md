@@ -23,3 +23,4 @@ run application
 ```
 python main.py
 ```
+Then Open `index.html` in your browser
